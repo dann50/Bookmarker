@@ -1,6 +1,10 @@
 package com.example.bookmarker
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -19,29 +23,33 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BookmarkerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                //Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    BookmarkerApp()
+                saveBookmark(intent)
+                //}
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+    private fun saveBookmark(intent: Intent) {
+        if (Intent.ACTION_SEND == intent.action) {
+            val pageUrl = getIntent().getStringExtra(Intent.EXTRA_STREAM)
+                ?: getIntent().getStringExtra(Intent.EXTRA_TEXT)
+
+            if (pageUrl != null && Uri.parse(pageUrl).scheme!!.startsWith("http")) {
+                //motor.save(pageUrl)
+            } else {
+                Toast.makeText(this, R.string.msg_invalid_url, Toast.LENGTH_LONG).show()
+                finish()
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     BookmarkerTheme {
-        Greeting("Android")
+
     }
 }
