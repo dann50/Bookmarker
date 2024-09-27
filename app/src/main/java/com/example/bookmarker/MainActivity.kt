@@ -24,8 +24,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             BookmarkerTheme {
                 //Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    BookmarkerApp()
                 saveBookmark(intent)
+                    BookmarkerApp()
+
                 //}
             }
         }
