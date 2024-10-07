@@ -10,6 +10,8 @@ import com.example.bookmarker.data.Bookmark
 import com.example.bookmarker.data.BookmarkRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class BookmarkViewModel (private val bookmarkRepository: BookmarkRepository) : ViewModel() {
@@ -23,7 +25,7 @@ class BookmarkViewModel (private val bookmarkRepository: BookmarkRepository) : V
         }
     }
 
-    suspend fun getBookmarks() {
+    private suspend fun getBookmarks() {
         bookmarkRepository.getBookmarks().collect { bookmarks ->
             _uiState.value = bookmarks
         }
@@ -37,10 +39,20 @@ class BookmarkViewModel (private val bookmarkRepository: BookmarkRepository) : V
         bookmarkRepository.delete(bookmark)
     }
 
+    fun updateUiStateSearch(s: String) {
+        if (s.isNotBlank()) {
+            viewModelScope.launch {
+                bookmarkRepository.searchBookmarks(s).collect { bookmarks ->
+                    _uiState.update { bookmarks }
+                }
+            }
+        }
+    }
+
     companion object {
         val factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val application: BookmarkerApplication = this.get(APPLICATION_KEY) as BookmarkerApplication
+                val application: BookmarkerApplication = this[APPLICATION_KEY] as BookmarkerApplication
                 BookmarkViewModel(application.bookmarkRepository)
             }
         }

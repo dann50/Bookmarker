@@ -12,6 +12,9 @@ interface BookmarkDao {
     @Query("SELECT * FROM bookmark")
     fun getBookmarks(): Flow<List<Bookmark>>
 
+    @Query("SELECT * FROM bookmark WHERE title LIKE :key OR page_url LIKE :key")
+    fun searchBookmarks(key: String): Flow<List<Bookmark>>
+
     @Insert
     suspend fun insert(bookmark: Bookmark)
 

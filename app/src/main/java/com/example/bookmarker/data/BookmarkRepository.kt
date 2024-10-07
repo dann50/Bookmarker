@@ -6,6 +6,8 @@ class BookmarkRepository(private val bookmarkDatabase: BookmarkDatabase) {
 
     fun getBookmarks(): Flow<List<Bookmark>> = bookmarkDatabase.bookmarkDao().getBookmarks()
 
+    fun searchBookmarks(key: String): Flow<List<Bookmark>> = bookmarkDatabase.bookmarkDao().searchBookmarks(key)
+
     suspend fun insert(bookmark: Bookmark) = bookmarkDatabase.bookmarkDao().insert(bookmark)
 
     suspend fun delete(bookmark: Bookmark) = bookmarkDatabase.bookmarkDao().delete(bookmark)
