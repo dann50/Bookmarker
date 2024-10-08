@@ -3,4 +3,7 @@
     <string name="icon">Icon</string>
     <string name="msg_invalid_url">Did not receive a valid URL!</string>
     <string name="search_bar_placeholder">Search saved sites</string>
+    <string name="new_link_placeholder">Enter new link</string>
+    <string name="ok_button">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>

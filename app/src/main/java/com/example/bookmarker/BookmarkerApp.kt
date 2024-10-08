@@ -1,5 +1,6 @@
 package com.example.bookmarker
 
+import android.app.Activity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,9 +16,12 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -26,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
@@ -41,9 +46,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -61,6 +69,7 @@ fun BookmarkerApp() {
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState = viewModel.uiState.collectAsStateWithLifecycle(lifecycleOwner)
+    var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.statusBarsPadding().nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -74,7 +83,9 @@ fun BookmarkerApp() {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {}
+                onClick = {
+                    showDialog = true
+                }
             ) {
                 Icon(
                     imageVector =  Icons.Default.Add,
@@ -91,6 +102,13 @@ fun BookmarkerApp() {
                 contentPadding = it
             )
         }
+    }
+
+    if (showDialog) {
+        NewLinkDialog(
+            addLink = {},
+            dismiss = { showDialog = false }
+        )
     }
 }
 
@@ -118,6 +136,48 @@ fun TopSearchBar(
         ),
         shape = RoundedCornerShape(50.dp),
         modifier = modifier
+    )
+}
+
+@Composable
+private fun NewLinkDialog(
+    addLink: (String) -> Unit,
+    dismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var content by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = {
+            // Dismiss the dialog when the user clicks outside the dialog or on the back
+            // button. If you want to disable that functionality, simply use an empty
+            // onCloseRequest.
+        },
+        title = { Text(text = stringResource(R.string.new_link_placeholder)) },
+        text = {
+            TextField(
+                value = content,
+                onValueChange = { content = it },
+                placeholder = { Text(text = stringResource(R.string.new_link_placeholder)) },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { addLink(content) })
+            )
+        },
+        modifier = modifier,
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    dismiss()
+                }
+            ) {
+                Text(text = stringResource(R.string.cancel))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { addLink(content) }) {
+                Text(text = stringResource(R.string.ok_button))
+            }
+        }
     )
 }
 
@@ -154,12 +214,8 @@ fun BookmarkCard(
         modifier = modifier
             .clickable { onCardClick(bookmark) }
     ) {
-        Row(
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+        Row(modifier = Modifier.padding(8.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = bookmark.pageTitle,
                     overflow = TextOverflow.Ellipsis
