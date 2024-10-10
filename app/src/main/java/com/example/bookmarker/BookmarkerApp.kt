@@ -1,6 +1,5 @@
 package com.example.bookmarker
 
-import android.app.Activity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,7 +23,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -50,8 +48,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,10 +58,9 @@ import com.example.bookmarker.ui.theme.BookmarkerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookmarkerApp() {
+fun BookmarkerApp(viewModel: BookmarkViewModel = viewModel()) {
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val viewModel: BookmarkViewModel = viewModel(factory = BookmarkViewModel.factory)
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState = viewModel.uiState.collectAsStateWithLifecycle(lifecycleOwner)
@@ -106,7 +101,7 @@ fun BookmarkerApp() {
 
     if (showDialog) {
         NewLinkDialog(
-            addLink = {},
+            addLink = viewModel::saveBookmark,
             dismiss = { showDialog = false }
         )
     }
@@ -166,9 +161,7 @@ private fun NewLinkDialog(
         modifier = modifier,
         dismissButton = {
             TextButton(
-                onClick = {
-                    dismiss()
-                }
+                onClick = { dismiss() }
             ) {
                 Text(text = stringResource(R.string.cancel))
             }

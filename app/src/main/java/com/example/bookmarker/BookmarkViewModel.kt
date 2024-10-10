@@ -31,8 +31,12 @@ class BookmarkViewModel (private val bookmarkRepository: BookmarkRepository) : V
         }
     }
 
-    suspend fun saveBookmark(bookmark: Bookmark) {
-        bookmarkRepository.insert(bookmark)
+    fun saveBookmark(pageUrl: String?) {
+        viewModelScope.launch {
+
+        }
+
+        //bookmarkRepository.insert()
     }
 
     suspend fun deleteBookmark(bookmark: Bookmark) {
