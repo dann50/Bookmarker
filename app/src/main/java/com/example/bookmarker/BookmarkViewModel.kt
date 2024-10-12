@@ -31,9 +31,13 @@ class BookmarkViewModel (private val bookmarkRepository: BookmarkRepository) : V
         }
     }
 
-    fun saveBookmark(pageUrl: String?) {
+    fun saveBookmark(pageUrl: String) {
+        var s = pageUrl
+        if (!pageUrl.startsWith("http")) {
+            s = "http://${pageUrl}"
+        }
         viewModelScope.launch {
-
+            //bookmarkRepository.insert()
         }
 
         //bookmarkRepository.insert()
