@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 private const val DB_NAME = "app_database"
 
-@Database(entities = [Bookmark::class], version = 1, exportSchema = false)
+@Database(entities = [Bookmark::class], version = 2, exportSchema = false)
 abstract class BookmarkDatabase : RoomDatabase() {
 
     abstract fun bookmarkDao() : BookmarkDao

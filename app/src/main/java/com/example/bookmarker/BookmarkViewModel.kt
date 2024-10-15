@@ -1,5 +1,6 @@
 package com.example.bookmarker
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -8,11 +9,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookmarker.data.Bookmark
 import com.example.bookmarker.data.BookmarkRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jsoup.Jsoup
 
 class BookmarkViewModel (private val bookmarkRepository: BookmarkRepository) : ViewModel() {
 
@@ -32,15 +34,16 @@ class BookmarkViewModel (private val bookmarkRepository: BookmarkRepository) : V
     }
 
     fun saveBookmark(pageUrl: String) {
-        var s = pageUrl
-        if (!pageUrl.startsWith("http")) {
-            s = "http://${pageUrl}"
+        viewModelScope.launch(Dispatchers.IO) {
+            val doc = Jsoup.connect(pageUrl).get()
+            val title = doc.title()
+            val iconUrl: String? = doc.head().select("link[href~=.*\\.(ico|png)]").first()?.attr("href")
+                    ?: doc.head().select("meta[itemprop=image]").first().attr("content")
+            if (iconUrl != null) {
+                Log.i("BookmarkViewModel", iconUrl)
+            }
+            bookmarkRepository.insert(Bookmark(pageUrl = pageUrl, pageTitle = title, iconUrl = iconUrl, date = System.currentTimeMillis().toString()))
         }
-        viewModelScope.launch {
-            //bookmarkRepository.insert()
-        }
-
-        //bookmarkRepository.insert()
     }
 
     suspend fun deleteBookmark(bookmark: Bookmark) {
@@ -50,7 +53,7 @@ class BookmarkViewModel (private val bookmarkRepository: BookmarkRepository) : V
     fun updateUiStateSearch(s: String) {
         if (s.isNotBlank()) {
             viewModelScope.launch {
-                bookmarkRepository.searchBookmarks(s).collect { bookmarks ->
+                bookmarkRepository.searchBookmarks(s.trim()).collect { bookmarks ->
                     _uiState.update { bookmarks }
                 }
             }

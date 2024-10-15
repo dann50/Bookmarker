@@ -14,7 +14,7 @@ room = "2.6.1"
 datastorePrefs = "1.1.1"
 lifecycleRuntimeComposeAndroid = "2.8.6"
 ksp = "2.0.0-1.0.21"
-jsoup = "1.17.2"
+jsoup = "1.18.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

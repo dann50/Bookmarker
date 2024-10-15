@@ -101,7 +101,10 @@ fun BookmarkerApp(viewModel: BookmarkViewModel = viewModel()) {
 
     if (showDialog) {
         NewLinkDialog(
-            addLink = viewModel::saveBookmark,
+            addLink = { s ->
+                viewModel.saveBookmark(if (s.startsWith("https")) s else "https://${s}")
+                showDialog = false
+            },
             dismiss = { showDialog = false }
         )
     }
@@ -167,7 +170,9 @@ private fun NewLinkDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { addLink(content) }) {
+            TextButton(onClick = {
+                addLink(content)
+            }) {
                 Text(text = stringResource(R.string.ok_button))
             }
         }
@@ -183,10 +188,10 @@ fun BookmarkList(
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().padding(horizontal = 8.dp),
         contentPadding = contentPadding
     ) {
-        items(bookmarksList) { bookmark ->
+        items(items = bookmarksList, key = { it.id }) { bookmark ->
             BookmarkCard(
                 bookmark = bookmark,
                 onCardClick = onCardClick,

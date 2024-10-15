@@ -16,8 +16,8 @@ data class Bookmark (
     val pageTitle: String,
 
     @ColumnInfo(name = "icon_url")
-    val iconUrl: String,
+    val iconUrl: String?,
 
-    @ColumnInfo(name = "date", defaultValue = "CURRENT_TIMESTAMP")
+    @ColumnInfo(name = "date")
     val date: String
 )
